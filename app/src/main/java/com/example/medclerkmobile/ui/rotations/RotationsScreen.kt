@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,21 +17,27 @@ import com.example.medclerkmobile.ui.ChipColor
 import com.example.medclerkmobile.ui.ListViewModel
 import com.example.medclerkmobile.ui.MedCard
 import com.example.medclerkmobile.ui.MedChip
+import com.example.medclerkmobile.ui.ScreenHeader
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.formatApiDate
 
 @Composable
-fun RotationsScreen(container: AppContainer, modifier: Modifier = Modifier) {
+fun RotationsScreen(container: AppContainer, onBack: () -> Unit, modifier: Modifier = Modifier) {
     val viewModel = appViewModel(container, key = "rotations") { ListViewModel { it.rotationRepository.myRotations() } }
     val state by viewModel.state.collectAsState()
 
-    StateListContent(
-        state = state,
-        emptyMessage = "You don't have any rotations yet.",
-        onRetry = viewModel::refresh,
+    Scaffold(
         modifier = modifier,
-    ) { rotation -> RotationCard(rotation) }
+        topBar = { ScreenHeader(title = "Rotations", onBack = onBack) },
+    ) { innerPadding ->
+        StateListContent(
+            state = state,
+            emptyMessage = "You don't have any rotations yet.",
+            onRetry = viewModel::refresh,
+            modifier = Modifier.padding(innerPadding),
+        ) { rotation -> RotationCard(rotation) }
+    }
 }
 
 private fun statusChipColor(status: String): ChipColor = when (status) {

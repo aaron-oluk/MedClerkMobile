@@ -4,6 +4,8 @@ object Routes {
     const val LOGIN = "login"
     const val HOME = "home"
     const val NEW_LOGBOOK_ENTRY = "logbook/new"
+    const val ROTATIONS = "rotations"
+    const val FEEDBACK = "feedback"
 
     const val SYSTEM_ID_ARG = "systemId"
     const val SIGN_ID_ARG = "signId"

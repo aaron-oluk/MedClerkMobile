@@ -22,6 +22,7 @@ data class ClinicalSystem(
     val icon: String? = null,
     val color: String? = null,
     @SerialName("clinical_signs_count") val signCount: Int = 0,
+    @SerialName("mastery_pct") val masteryPct: Float? = null,
     val tags: List<Tag> = emptyList(),
 )
 
@@ -100,6 +101,7 @@ data class Skill(
     @SerialName("competency_codes") val competencyCodes: List<String>? = null,
     val equipment: List<String>? = null,
     @SerialName("est_minutes") val estMinutes: Int? = null,
+    @SerialName("mastery_pct") val masteryPct: Float? = null,
     @SerialName("clinical_system") val clinicalSystem: NamedRef? = null,
     val tags: List<Tag> = emptyList(),
 )

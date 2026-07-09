@@ -19,10 +19,12 @@ import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.navigation.Routes
 import com.example.medclerkmobile.ui.auth.LoginScreen
 import com.example.medclerkmobile.ui.dashboard.DashboardScreen
+import com.example.medclerkmobile.ui.feedback.FeedbackScreen
 import com.example.medclerkmobile.ui.library.SignDetailScreen
 import com.example.medclerkmobile.ui.library.SkillDetailScreen
 import com.example.medclerkmobile.ui.library.SystemDetailScreen
 import com.example.medclerkmobile.ui.logbook.NewLogbookEntryScreen
+import com.example.medclerkmobile.ui.rotations.RotationsScreen
 import com.example.medclerkmobile.ui.theme.MedClerkMobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -60,8 +62,18 @@ private fun MedClerkApp(container: AppContainer) {
                 onAddLogbookEntry = { navController.navigate(Routes.NEW_LOGBOOK_ENTRY) },
                 onOpenLibrarySystem = { id -> navController.navigate(Routes.systemDetail(id)) },
                 onOpenLibrarySign = { id -> navController.navigate(Routes.signDetail(id)) },
+                onOpenRotations = { navController.navigate(Routes.ROTATIONS) },
+                onOpenFeedback = { navController.navigate(Routes.FEEDBACK) },
                 onLoggedOut = { navController.navigateToLogin() },
             )
+        }
+
+        composable(Routes.ROTATIONS) {
+            RotationsScreen(container = container, onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.FEEDBACK) {
+            FeedbackScreen(container = container, onBack = { navController.popBackStack() })
         }
 
         composable(Routes.NEW_LOGBOOK_ENTRY) {

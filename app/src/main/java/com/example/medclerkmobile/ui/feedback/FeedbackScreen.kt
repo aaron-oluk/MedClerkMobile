@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,6 +17,7 @@ import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.Feedback
 import com.example.medclerkmobile.ui.ListViewModel
 import com.example.medclerkmobile.ui.MedCard
+import com.example.medclerkmobile.ui.ScreenHeader
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.formatApiDate
@@ -23,16 +25,21 @@ import com.example.medclerkmobile.ui.theme.Amber700
 import com.example.medclerkmobile.ui.theme.Emerald700
 
 @Composable
-fun FeedbackScreen(container: AppContainer, modifier: Modifier = Modifier) {
+fun FeedbackScreen(container: AppContainer, onBack: () -> Unit, modifier: Modifier = Modifier) {
     val viewModel = appViewModel(container, key = "feedback") { ListViewModel { it.feedbackRepository.myFeedback() } }
     val state by viewModel.state.collectAsState()
 
-    StateListContent(
-        state = state,
-        emptyMessage = "No feedback yet.",
-        onRetry = viewModel::refresh,
+    Scaffold(
         modifier = modifier,
-    ) { feedback -> FeedbackCard(feedback) }
+        topBar = { ScreenHeader(title = "Feedback", onBack = onBack) },
+    ) { innerPadding ->
+        StateListContent(
+            state = state,
+            emptyMessage = "No feedback yet.",
+            onRetry = viewModel::refresh,
+            modifier = Modifier.padding(innerPadding),
+        ) { feedback -> FeedbackCard(feedback) }
+    }
 }
 
 @Composable
