@@ -25,7 +25,7 @@ import com.example.medclerkmobile.ui.appViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(container: AppContainer, onLoggedIn: () -> Unit) {
-    val viewModel = appViewModel(container) { LoginViewModel(it.authRepository) }
+    val viewModel = appViewModel(container, key = "login") { LoginViewModel(it.authRepository) }
 
     Column(
         modifier = Modifier

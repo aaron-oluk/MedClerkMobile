@@ -33,7 +33,7 @@ import com.example.medclerkmobile.ui.appViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewLogbookEntryScreen(container: AppContainer, onSaved: () -> Unit, onCancel: () -> Unit) {
-    val viewModel = appViewModel(container) {
+    val viewModel = appViewModel(container, key = "new-logbook-entry") {
         NewLogbookEntryViewModel(it.logbookRepository, it.rotationRepository)
     }
     val optionsState by viewModel.options.collectAsState()

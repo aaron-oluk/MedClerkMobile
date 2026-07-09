@@ -12,8 +12,15 @@ class ViewModelFactory(private val create: (AppContainer) -> ViewModel, private 
     override fun <T : ViewModel> create(modelClass: Class<T>): T = create(container) as T
 }
 
+/**
+ * A `key` is required (rather than relying on Compose's default class-based key) because
+ * generic ViewModels such as ListViewModel<T> erase to the same runtime class regardless of
+ * T. Without a distinct key, screens sharing one ViewModelStoreOwner (e.g. tabs switched via
+ * a plain `when`, not separate nav destinations) would collide on a single cached instance.
+ */
 @Composable
 inline fun <reified VM : ViewModel> appViewModel(
     container: AppContainer,
+    key: String,
     noinline create: (AppContainer) -> VM,
-): VM = viewModel(factory = ViewModelFactory(create, container))
+): VM = viewModel(factory = ViewModelFactory(create, container), key = key)

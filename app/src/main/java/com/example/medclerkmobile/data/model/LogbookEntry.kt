@@ -14,7 +14,7 @@ data class LogbookEntry(
     val findings: Map<String, JsonElement>? = null,
     val notes: String? = null,
     val rotation: NamedRef? = null,
-    @SerialName("clinicalSign") val clinicalSign: NamedRef? = null,
+    @SerialName("clinical_sign") val clinicalSign: NamedRef? = null,
     val skill: NamedRef? = null,
 )
 

@@ -16,10 +16,11 @@ import com.example.medclerkmobile.data.model.Feedback
 import com.example.medclerkmobile.ui.ListViewModel
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
+import com.example.medclerkmobile.ui.formatApiDate
 
 @Composable
 fun FeedbackScreen(container: AppContainer, modifier: Modifier = Modifier) {
-    val viewModel = appViewModel(container) { ListViewModel { it.feedbackRepository.myFeedback() } }
+    val viewModel = appViewModel(container, key = "feedback") { ListViewModel { it.feedbackRepository.myFeedback() } }
     val state by viewModel.state.collectAsState()
 
     StateListContent(
@@ -46,7 +47,7 @@ private fun FeedbackCard(feedback: Feedback) {
                 Text(text = it, style = MaterialTheme.typography.bodyMedium)
             }
             feedback.followUpDate?.let {
-                Text(text = "Follow up: $it", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Follow up: ${formatApiDate(it)}", style = MaterialTheme.typography.bodySmall)
             }
         }
     }

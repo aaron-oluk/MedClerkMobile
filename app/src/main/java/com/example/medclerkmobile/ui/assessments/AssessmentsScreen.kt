@@ -16,10 +16,11 @@ import com.example.medclerkmobile.data.model.Assessment
 import com.example.medclerkmobile.ui.ListViewModel
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
+import com.example.medclerkmobile.ui.formatApiDate
 
 @Composable
 fun AssessmentsScreen(container: AppContainer, modifier: Modifier = Modifier) {
-    val viewModel = appViewModel(container) { ListViewModel { it.assessmentRepository.myAssessments() } }
+    val viewModel = appViewModel(container, key = "assessments") { ListViewModel { it.assessmentRepository.myAssessments() } }
     val state by viewModel.state.collectAsState()
 
     StateListContent(
@@ -49,7 +50,7 @@ private fun AssessmentCard(assessment: Assessment) {
             assessment.assessor?.let {
                 Text(text = "Assessed by ${it.name}", style = MaterialTheme.typography.bodySmall)
             }
-            Text(text = assessment.assessedAt, style = MaterialTheme.typography.bodySmall)
+            Text(text = formatApiDate(assessment.assessedAt), style = MaterialTheme.typography.bodySmall)
         }
     }
 }

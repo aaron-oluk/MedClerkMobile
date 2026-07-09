@@ -23,10 +23,11 @@ import com.example.medclerkmobile.data.model.LogbookEntry
 import com.example.medclerkmobile.ui.ListViewModel
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
+import com.example.medclerkmobile.ui.formatApiDate
 
 @Composable
 fun LogbookScreen(container: AppContainer, onAddEntry: () -> Unit, modifier: Modifier = Modifier) {
-    val viewModel = appViewModel(container) { ListViewModel { it.logbookRepository.myEntries() } }
+    val viewModel = appViewModel(container, key = "logbook-entries") { ListViewModel { it.logbookRepository.myEntries() } }
     val state by viewModel.state.collectAsState()
 
     Scaffold(
@@ -58,7 +59,7 @@ private fun LogbookEntryCard(entry: LogbookEntry) {
             entry.rotation?.let {
                 Text(text = it.name, style = MaterialTheme.typography.bodyMedium)
             }
-            Text(text = entry.encounterDate, style = MaterialTheme.typography.bodySmall)
+            Text(text = formatApiDate(entry.encounterDate), style = MaterialTheme.typography.bodySmall)
             entry.notes?.let {
                 Text(
                     text = it,

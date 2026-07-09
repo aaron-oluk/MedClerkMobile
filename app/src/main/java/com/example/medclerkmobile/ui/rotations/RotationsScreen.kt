@@ -16,10 +16,11 @@ import com.example.medclerkmobile.data.model.Rotation
 import com.example.medclerkmobile.ui.ListViewModel
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
+import com.example.medclerkmobile.ui.formatApiDate
 
 @Composable
 fun RotationsScreen(container: AppContainer, modifier: Modifier = Modifier) {
-    val viewModel = appViewModel(container) { ListViewModel { it.rotationRepository.myRotations() } }
+    val viewModel = appViewModel(container, key = "rotations") { ListViewModel { it.rotationRepository.myRotations() } }
     val state by viewModel.state.collectAsState()
 
     StateListContent(
@@ -39,7 +40,7 @@ private fun RotationCard(rotation: Rotation) {
                 Text(text = it.name, style = MaterialTheme.typography.bodyMedium)
             }
             Text(
-                text = "${rotation.startDate} – ${rotation.endDate ?: "present"}",
+                text = "${formatApiDate(rotation.startDate)} – ${rotation.endDate?.let(::formatApiDate) ?: "present"}",
                 style = MaterialTheme.typography.bodySmall,
             )
             Text(

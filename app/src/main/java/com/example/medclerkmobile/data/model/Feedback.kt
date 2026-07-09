@@ -11,7 +11,7 @@ data class Feedback(
     @SerialName("follow_up_date") val followUpDate: String? = null,
     @SerialName("created_at") val createdAt: String? = null,
     val assessment: AssessmentRef? = null,
-    @SerialName("givenBy") val givenBy: NamedRef? = null,
+    @SerialName("given_by") val givenBy: NamedRef? = null,
 )
 
 @Serializable
