@@ -25,4 +25,6 @@ class AuthRepository(
         tokenStore.clear()
         onLoginStateChanged(false)
     }
+
+    suspend fun currentUser(): Result<User> = safeCall { api.currentUser() }
 }

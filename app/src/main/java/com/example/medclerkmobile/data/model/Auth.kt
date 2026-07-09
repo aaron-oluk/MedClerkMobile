@@ -25,4 +25,19 @@ data class User(
     @SerialName("student_number") val studentNumber: String? = null,
     @SerialName("institution_id") val institutionId: Int? = null,
     @SerialName("department_id") val departmentId: Int? = null,
+    val institution: Institution? = null,
+    val department: Department? = null,
+)
+
+@Serializable
+data class Institution(
+    val id: Int,
+    val name: String,
+    val country: String? = null,
+)
+
+@Serializable
+data class Department(
+    val id: Int,
+    val name: String,
 )

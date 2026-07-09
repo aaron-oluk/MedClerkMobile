@@ -96,7 +96,7 @@ fun DashboardScreen(
             1 -> LibraryScreen(container, onOpenLibrarySystem, onOpenLibrarySign, content)
             2 -> LogbookScreen(container, onAddLogbookEntry, content)
             3 -> AssessmentsScreen(container, content)
-            else -> ProfileScreen(container, onLoggedOut, content)
+            else -> ProfileScreen(container, onOpenRotations, onLoggedOut, content)
         }
     }
 }
