@@ -10,13 +10,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.navigation.Routes
 import com.example.medclerkmobile.ui.auth.LoginScreen
 import com.example.medclerkmobile.ui.dashboard.DashboardScreen
+import com.example.medclerkmobile.ui.library.SignDetailScreen
+import com.example.medclerkmobile.ui.library.SkillDetailScreen
+import com.example.medclerkmobile.ui.library.SystemDetailScreen
 import com.example.medclerkmobile.ui.logbook.NewLogbookEntryScreen
 import com.example.medclerkmobile.ui.theme.MedClerkMobileTheme
 
@@ -53,6 +58,8 @@ private fun MedClerkApp(container: AppContainer) {
             DashboardScreen(
                 container = container,
                 onAddLogbookEntry = { navController.navigate(Routes.NEW_LOGBOOK_ENTRY) },
+                onOpenLibrarySystem = { id -> navController.navigate(Routes.systemDetail(id)) },
+                onOpenLibrarySign = { id -> navController.navigate(Routes.signDetail(id)) },
                 onLoggedOut = { navController.navigateToLogin() },
             )
         }
@@ -63,6 +70,36 @@ private fun MedClerkApp(container: AppContainer) {
                 onSaved = { navController.popBackStack() },
                 onCancel = { navController.popBackStack() },
             )
+        }
+
+        composable(
+            Routes.SYSTEM_DETAIL,
+            arguments = listOf(navArgument(Routes.SYSTEM_ID_ARG) { type = NavType.IntType }),
+        ) { backStackEntry ->
+            val systemId = backStackEntry.arguments?.getInt(Routes.SYSTEM_ID_ARG) ?: return@composable
+            SystemDetailScreen(
+                container = container,
+                systemId = systemId,
+                onBack = { navController.popBackStack() },
+                onOpenSign = { id -> navController.navigate(Routes.signDetail(id)) },
+                onOpenSkill = { id -> navController.navigate(Routes.skillDetail(id)) },
+            )
+        }
+
+        composable(
+            Routes.SIGN_DETAIL,
+            arguments = listOf(navArgument(Routes.SIGN_ID_ARG) { type = NavType.IntType }),
+        ) { backStackEntry ->
+            val signId = backStackEntry.arguments?.getInt(Routes.SIGN_ID_ARG) ?: return@composable
+            SignDetailScreen(container = container, signId = signId, onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            Routes.SKILL_DETAIL,
+            arguments = listOf(navArgument(Routes.SKILL_ID_ARG) { type = NavType.IntType }),
+        ) { backStackEntry ->
+            val skillId = backStackEntry.arguments?.getInt(Routes.SKILL_ID_ARG) ?: return@composable
+            SkillDetailScreen(container = container, skillId = skillId, onBack = { navController.popBackStack() })
         }
     }
 }

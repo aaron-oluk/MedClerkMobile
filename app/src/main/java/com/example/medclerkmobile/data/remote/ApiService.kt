@@ -1,6 +1,8 @@
 package com.example.medclerkmobile.data.remote
 
 import com.example.medclerkmobile.data.model.Assessment
+import com.example.medclerkmobile.data.model.ClinicalSign
+import com.example.medclerkmobile.data.model.ClinicalSystem
 import com.example.medclerkmobile.data.model.Feedback
 import com.example.medclerkmobile.data.model.LoginRequest
 import com.example.medclerkmobile.data.model.LoginResponse
@@ -9,10 +11,13 @@ import com.example.medclerkmobile.data.model.NamedRef
 import com.example.medclerkmobile.data.model.NewLogbookEntry
 import com.example.medclerkmobile.data.model.PaginatedResponse
 import com.example.medclerkmobile.data.model.Rotation
+import com.example.medclerkmobile.data.model.Skill
 import com.example.medclerkmobile.data.model.User
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("auth/login")
@@ -44,4 +49,22 @@ interface ApiService {
 
     @GET("skills")
     suspend fun skills(): PaginatedResponse<NamedRef>
+
+    @GET("clinical-systems")
+    suspend fun clinicalSystems(): PaginatedResponse<ClinicalSystem>
+
+    @GET("clinical-systems/{id}")
+    suspend fun clinicalSystem(@Path("id") id: Int): ClinicalSystem
+
+    @GET("clinical-signs")
+    suspend fun clinicalSignsFull(@Query("clinical_system_id") systemId: Int? = null): PaginatedResponse<ClinicalSign>
+
+    @GET("clinical-signs/{id}")
+    suspend fun clinicalSign(@Path("id") id: Int): ClinicalSign
+
+    @GET("skills")
+    suspend fun skillsFull(): PaginatedResponse<Skill>
+
+    @GET("skills/{id}")
+    suspend fun skill(@Path("id") id: Int): Skill
 }

@@ -9,6 +9,7 @@ import com.example.medclerkmobile.data.remote.SessionExpiredInterceptor
 import com.example.medclerkmobile.data.repository.AssessmentRepository
 import com.example.medclerkmobile.data.repository.AuthRepository
 import com.example.medclerkmobile.data.repository.FeedbackRepository
+import com.example.medclerkmobile.data.repository.LibraryRepository
 import com.example.medclerkmobile.data.repository.LogbookRepository
 import com.example.medclerkmobile.data.repository.RotationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,6 +63,7 @@ class AppContainer(context: Context) {
     val logbookRepository = LogbookRepository(apiService)
     val assessmentRepository = AssessmentRepository(apiService)
     val feedbackRepository = FeedbackRepository(apiService)
+    val libraryRepository = LibraryRepository(apiService)
 
     val currentUserName: String? get() = tokenStore.userName
     val currentUserRole: String? get() = tokenStore.userRole
