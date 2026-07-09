@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,7 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.Skill
-import com.example.medclerkmobile.ui.BackTopAppBar
+import com.example.medclerkmobile.ui.HeaderTone
+import com.example.medclerkmobile.ui.MedCard
+import com.example.medclerkmobile.ui.ScreenHeader
+import com.example.medclerkmobile.ui.SectionTitle
 import com.example.medclerkmobile.ui.UiState
 import com.example.medclerkmobile.ui.appViewModel
 
@@ -39,11 +41,18 @@ fun SystemDetailScreen(
         SystemDetailViewModel(it.libraryRepository, systemId)
     }
     val state by viewModel.state.collectAsState()
+    val successState = state as? UiState.Success
 
     Scaffold(
         modifier = modifier,
         topBar = {
-            BackTopAppBar(title = (state as? UiState.Success)?.data?.system?.name ?: "System", onBack = onBack)
+            ScreenHeader(
+                title = successState?.data?.system?.name ?: "System",
+                subtitle = successState?.data?.signs?.size?.let { "$it signs in this system" },
+                tone = HeaderTone.Dark,
+                accentColor = parseHexColor(successState?.data?.system?.color, MaterialTheme.colorScheme.primary),
+                onBack = onBack,
+            )
         },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
@@ -62,17 +71,11 @@ fun SystemDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     if (s.data.skills.isNotEmpty()) {
-                        item {
-                            Text(text = "Skills", style = MaterialTheme.typography.titleSmall)
-                        }
+                        item { SectionTitle(text = "Skills") }
                         items(s.data.skills) { skill -> SkillRow(skill, onClick = { onOpenSkill(skill.id) }) }
                     }
                     item {
-                        Text(
-                            text = "Signs",
-                            style = MaterialTheme.typography.titleSmall,
-                            modifier = Modifier.padding(top = 8.dp),
-                        )
+                        SectionTitle(text = "Signs", modifier = Modifier.padding(top = 8.dp))
                     }
                     items(s.data.signs) { sign -> SignRow(sign, onClick = { onOpenSign(sign.id) }) }
                 }
@@ -83,7 +86,7 @@ fun SystemDetailScreen(
 
 @Composable
 internal fun SkillRow(skill: Skill, onClick: () -> Unit) {
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    MedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,6 +100,7 @@ internal fun SkillRow(skill: Skill, onClick: () -> Unit) {
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
     }

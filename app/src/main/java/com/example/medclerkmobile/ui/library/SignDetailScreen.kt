@@ -10,12 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -30,22 +27,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.ClinicalSign
-import com.example.medclerkmobile.ui.BackTopAppBar
+import com.example.medclerkmobile.ui.ChipColor
+import com.example.medclerkmobile.ui.HeaderTone
+import com.example.medclerkmobile.ui.MedCard
+import com.example.medclerkmobile.ui.MedChip
+import com.example.medclerkmobile.ui.ScreenHeader
 import com.example.medclerkmobile.ui.UiState
 import com.example.medclerkmobile.ui.appViewModel
 
 private val tabs = listOf("Overview", "Technique", "Interpretation")
+
+fun difficultyChipColor(difficulty: String): ChipColor = when (difficulty) {
+    "core" -> ChipColor.Teal
+    "intermediate" -> ChipColor.Amber
+    else -> ChipColor.Red
+}
 
 @Composable
 fun SignDetailScreen(container: AppContainer, signId: Int, onBack: () -> Unit, modifier: Modifier = Modifier) {
     val viewModel = appViewModel(container, key = "sign-detail") { SignDetailViewModel(it.libraryRepository, signId) }
     val state by viewModel.state.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
+    val successState = state as? UiState.Success
 
     Scaffold(
         modifier = modifier,
         topBar = {
-            BackTopAppBar(title = (state as? UiState.Success)?.data?.name ?: "Sign", onBack = onBack)
+            ScreenHeader(
+                title = successState?.data?.name ?: "Sign",
+                subtitle = successState?.data?.eponym,
+                tone = HeaderTone.Dark,
+                onBack = onBack,
+            )
         },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
@@ -90,9 +103,6 @@ fun SignDetailScreen(container: AppContainer, signId: Int, onBack: () -> Unit, m
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun OverviewTab(sign: ClinicalSign) {
-    sign.eponym?.let {
-        Text(text = "Eponym: $it", style = MaterialTheme.typography.bodyMedium)
-    }
     sign.description?.let {
         LabeledCard(label = "Summary", body = it)
     }
@@ -100,7 +110,7 @@ private fun OverviewTab(sign: ClinicalSign) {
         LabeledCard(label = "Diagnostic relevance", body = it)
     }
     sign.redFlags?.takeIf { it.isNotEmpty() }?.let { flags ->
-        Card(modifier = Modifier.fillMaxWidth()) {
+        MedCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(14.dp)) {
                 Text(
                     text = "Red flags",
@@ -119,9 +129,7 @@ private fun OverviewTab(sign: ClinicalSign) {
     }
     if (sign.tags.isNotEmpty()) {
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            sign.tags.forEach { tag ->
-                SuggestionChip(onClick = {}, label = { Text("#${tag.name}") })
-            }
+            sign.tags.forEach { tag -> MedChip(text = "#${tag.name}", color = ChipColor.Neutral) }
         }
     }
 }
@@ -134,12 +142,12 @@ private fun TechniqueTab(sign: ClinicalSign) {
 @Composable
 private fun InterpretationTab(sign: ClinicalSign) {
     LabeledCard(label = "Interpretation", body = sign.interpretation ?: "Not documented yet.")
-    AssistChip(onClick = {}, label = { Text("Difficulty: ${sign.difficulty}") })
+    MedChip(text = "Difficulty: ${sign.difficulty}", color = difficultyChipColor(sign.difficulty))
 }
 
 @Composable
 private fun LabeledCard(label: String, body: String) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    MedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(text = label, style = MaterialTheme.typography.labelLarge)
             Text(text = body, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 6.dp))

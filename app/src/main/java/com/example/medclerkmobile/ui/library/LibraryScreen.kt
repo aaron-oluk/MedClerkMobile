@@ -5,21 +5,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -33,6 +31,10 @@ import androidx.compose.ui.unit.dp
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.ClinicalSign
 import com.example.medclerkmobile.data.model.ClinicalSystem
+import com.example.medclerkmobile.ui.ChipColor
+import com.example.medclerkmobile.ui.MedCard
+import com.example.medclerkmobile.ui.MedChip
+import com.example.medclerkmobile.ui.SectionTitle
 import com.example.medclerkmobile.ui.UiState
 import com.example.medclerkmobile.ui.appViewModel
 
@@ -101,10 +103,9 @@ private fun LibraryContent(
                 items(matchingSystems) { system -> SystemCard(system, onClick = { onOpenSystem(system.id) }) }
             }
 
-            Text(
+            SectionTitle(
                 text = "Recently added signs",
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(start = 16.dp, top = 20.dp, bottom = 8.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).padding(top = 8.dp),
             )
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
@@ -128,7 +129,7 @@ private fun LibraryContent(
 @Composable
 private fun SystemCard(system: ClinicalSystem, onClick: () -> Unit) {
     val color = parseHexColor(system.color, MaterialTheme.colorScheme.primary)
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    MedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp)) {
             Box(
                 modifier = Modifier
@@ -154,13 +155,13 @@ private fun SystemCard(system: ClinicalSystem, onClick: () -> Unit) {
 
 @Composable
 internal fun SignRow(sign: ClinicalSign, onClick: () -> Unit) {
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    MedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = sign.name, style = MaterialTheme.typography.titleSmall)
-            Text(
+            MedChip(
                 text = sign.difficulty.replaceFirstChar { it.uppercase() },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = difficultyChipColor(sign.difficulty),
+                modifier = Modifier.padding(top = 6.dp),
             )
         }
     }

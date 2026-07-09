@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.LogbookEntry
+import com.example.medclerkmobile.ui.ChipColor
 import com.example.medclerkmobile.ui.ListViewModel
+import com.example.medclerkmobile.ui.MedCard
+import com.example.medclerkmobile.ui.MedChip
 import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.formatApiDate
@@ -50,16 +52,21 @@ fun LogbookScreen(container: AppContainer, onAddEntry: () -> Unit, modifier: Mod
 
 @Composable
 private fun LogbookEntryCard(entry: LogbookEntry) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    MedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = entry.clinicalSign?.name ?: entry.skill?.name ?: "Clinical encounter",
                 style = MaterialTheme.typography.titleMedium,
             )
             entry.rotation?.let {
-                Text(text = it.name, style = MaterialTheme.typography.bodyMedium)
+                MedChip(text = it.name, color = ChipColor.Teal, modifier = Modifier.padding(top = 6.dp))
             }
-            Text(text = formatApiDate(entry.encounterDate), style = MaterialTheme.typography.bodySmall)
+            Text(
+                text = formatApiDate(entry.encounterDate),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 6.dp),
+            )
             entry.notes?.let {
                 Text(
                     text = it,
