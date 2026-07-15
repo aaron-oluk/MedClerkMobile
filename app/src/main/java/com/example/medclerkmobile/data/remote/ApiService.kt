@@ -8,6 +8,8 @@ import com.example.medclerkmobile.data.model.LoginRequest
 import com.example.medclerkmobile.data.model.LoginResponse
 import com.example.medclerkmobile.data.model.LogbookEntry
 import com.example.medclerkmobile.data.model.NamedRef
+import com.example.medclerkmobile.data.model.NewAssessment
+import com.example.medclerkmobile.data.model.NewFeedback
 import com.example.medclerkmobile.data.model.NewLogbookEntry
 import com.example.medclerkmobile.data.model.PaginatedResponse
 import com.example.medclerkmobile.data.model.Rotation
@@ -36,6 +38,9 @@ interface ApiService {
 
     @GET("logbook-entries")
     suspend fun logbookEntries(): PaginatedResponse<LogbookEntry>
+
+    @GET("logbook-entries")
+    suspend fun pendingLogbookEntries(@Query("needs_assessment") needsAssessment: Boolean = true): PaginatedResponse<LogbookEntry>
 
     @POST("logbook-entries")
     suspend fun createLogbookEntry(@Body entry: NewLogbookEntry): LogbookEntry
@@ -78,4 +83,10 @@ interface ApiService {
 
     @GET("students/{id}")
     suspend fun student(@Path("id") id: Int): User
+
+    @POST("assessments")
+    suspend fun createAssessment(@Body request: NewAssessment): Assessment
+
+    @POST("feedback")
+    suspend fun createFeedback(@Body request: NewFeedback): Feedback
 }

@@ -16,6 +16,7 @@ data class LogbookEntry(
     val rotation: NamedRef? = null,
     @SerialName("clinical_sign") val clinicalSign: NamedRef? = null,
     val skill: NamedRef? = null,
+    val student: NamedRef? = null,
     @SerialName("consent_confirmed") val consentConfirmed: Boolean = false,
 )
 

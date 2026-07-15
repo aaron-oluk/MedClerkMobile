@@ -35,8 +35,10 @@ fun LogbookScreen(container: AppContainer, onAddEntry: () -> Unit, modifier: Mod
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddEntry) {
-                Icon(Icons.Filled.Add, contentDescription = "Log a new encounter")
+            if (container.currentUserRole == "student") {
+                FloatingActionButton(onClick = onAddEntry) {
+                    Icon(Icons.Filled.Add, contentDescription = "Log a new encounter")
+                }
             }
         },
     ) { innerPadding ->

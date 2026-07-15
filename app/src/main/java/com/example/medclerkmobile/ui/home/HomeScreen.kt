@@ -137,7 +137,7 @@ private fun HomeContent(
         }
 
         data.activeRotation?.let { rotation ->
-            ActiveRotationCard(rotation, onAddLogbookEntry, onOpenRotations)
+            ActiveRotationCard(rotation, data.user.role, onAddLogbookEntry, onOpenRotations)
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -200,7 +200,7 @@ private fun ProfileField(label: String, value: String) {
 }
 
 @Composable
-private fun ActiveRotationCard(rotation: Rotation, onAddLogbookEntry: () -> Unit, onOpenRotations: () -> Unit) {
+private fun ActiveRotationCard(rotation: Rotation, userRole: String, onAddLogbookEntry: () -> Unit, onOpenRotations: () -> Unit) {
     val progress = rotationProgress(rotation.startDate, rotation.endDate)
 
     MedCard(onClick = onOpenRotations, modifier = Modifier.fillMaxWidth()) {
@@ -246,12 +246,14 @@ private fun ActiveRotationCard(rotation: Rotation, onAddLogbookEntry: () -> Unit
                 }
             }
 
-            Button(
-                onClick = onAddLogbookEntry,
-                shape = RoundedCornerShape(0.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Record new encounter")
+            if (userRole == "student") {
+                Button(
+                    onClick = onAddLogbookEntry,
+                    shape = RoundedCornerShape(0.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Record new encounter")
+                }
             }
         }
     }

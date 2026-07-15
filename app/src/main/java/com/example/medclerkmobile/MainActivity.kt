@@ -17,9 +17,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.navigation.Routes
+import com.example.medclerkmobile.ui.assessments.NewAssessmentScreen
 import com.example.medclerkmobile.ui.auth.LoginScreen
 import com.example.medclerkmobile.ui.dashboard.DashboardScreen
 import com.example.medclerkmobile.ui.feedback.FeedbackScreen
+import com.example.medclerkmobile.ui.feedback.NewFeedbackScreen
 import com.example.medclerkmobile.ui.library.SignDetailScreen
 import com.example.medclerkmobile.ui.library.SkillDetailScreen
 import com.example.medclerkmobile.ui.library.SystemDetailScreen
@@ -69,6 +71,7 @@ private fun MedClerkApp(container: AppContainer) {
                 onOpenFeedback = { navController.navigate(Routes.FEEDBACK) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenStudentSearch = { navController.navigate(Routes.STUDENT_SEARCH) },
+                onAddAssessment = { navController.navigate(Routes.NEW_ASSESSMENT) },
                 onLoggedOut = { navController.navigateToLogin() },
             )
         }
@@ -78,7 +81,27 @@ private fun MedClerkApp(container: AppContainer) {
         }
 
         composable(Routes.FEEDBACK) {
-            FeedbackScreen(container = container, onBack = { navController.popBackStack() })
+            FeedbackScreen(
+                container = container,
+                onBack = { navController.popBackStack() },
+                onAddFeedback = { navController.navigate(Routes.NEW_FEEDBACK) },
+            )
+        }
+
+        composable(Routes.NEW_ASSESSMENT) {
+            NewAssessmentScreen(
+                container = container,
+                onSaved = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.NEW_FEEDBACK) {
+            NewFeedbackScreen(
+                container = container,
+                onSaved = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() },
+            )
         }
 
         composable(Routes.SETTINGS) {

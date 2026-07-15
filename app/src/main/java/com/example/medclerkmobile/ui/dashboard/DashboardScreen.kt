@@ -52,6 +52,7 @@ fun DashboardScreen(
     onOpenFeedback: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenStudentSearch: () -> Unit,
+    onAddAssessment: () -> Unit,
     onLoggedOut: () -> Unit,
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -97,7 +98,7 @@ fun DashboardScreen(
             )
             1 -> LibraryScreen(container, onOpenLibrarySystem, onOpenLibrarySign, content)
             2 -> LogbookScreen(container, onAddLogbookEntry, content)
-            3 -> AssessmentsScreen(container, content)
+            3 -> AssessmentsScreen(container, onAddAssessment, content)
             else -> ProfileScreen(container, onOpenRotations, onOpenSettings, onOpenStudentSearch, onLoggedOut, content)
         }
     }

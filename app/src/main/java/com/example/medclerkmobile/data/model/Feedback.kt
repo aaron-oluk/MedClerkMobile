@@ -19,3 +19,11 @@ data class AssessmentRef(
     val id: Int,
     val skill: NamedRef? = null,
 )
+
+@Serializable
+data class NewFeedback(
+    @SerialName("assessment_id") val assessmentId: Int,
+    val strengths: String? = null,
+    @SerialName("areas_to_improve") val areasToImprove: String? = null,
+    @SerialName("follow_up_date") val followUpDate: String? = null,
+)

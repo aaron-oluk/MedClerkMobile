@@ -14,3 +14,11 @@ data class Assessment(
     val rotation: NamedRef? = null,
     val assessor: NamedRef? = null,
 )
+
+@Serializable
+data class NewAssessment(
+    @SerialName("logbook_entry_id") val logbookEntryId: Int,
+    val score: Double,
+    @SerialName("max_score") val maxScore: Double,
+    @SerialName("assessed_at") val assessedAt: String,
+)

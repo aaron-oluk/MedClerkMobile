@@ -3,6 +3,10 @@ package com.example.medclerkmobile.ui.feedback
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,14 +28,24 @@ import com.example.medclerkmobile.ui.formatApiDate
 import com.example.medclerkmobile.ui.theme.Amber700
 import com.example.medclerkmobile.ui.theme.Emerald700
 
+private val canGiveFeedback = setOf("lecturer", "superadmin")
+
 @Composable
-fun FeedbackScreen(container: AppContainer, onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun FeedbackScreen(container: AppContainer, onBack: () -> Unit, onAddFeedback: () -> Unit, modifier: Modifier = Modifier) {
     val viewModel = appViewModel(container, key = "feedback") { ListViewModel { it.feedbackRepository.myFeedback() } }
     val state by viewModel.state.collectAsState()
 
     Scaffold(
         modifier = modifier,
         topBar = { ScreenHeader(title = "Feedback", onBack = onBack) },
+        floatingActionButton = {
+            val role = container.currentUserRole
+            if (role != null && role in canGiveFeedback) {
+                FloatingActionButton(onClick = onAddFeedback) {
+                    Icon(Icons.Filled.Add, contentDescription = "Give feedback")
+                }
+            }
+        },
     ) { innerPadding ->
         StateListContent(
             state = state,

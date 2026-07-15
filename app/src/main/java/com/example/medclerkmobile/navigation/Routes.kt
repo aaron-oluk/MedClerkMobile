@@ -8,6 +8,8 @@ object Routes {
     const val FEEDBACK = "feedback"
     const val SETTINGS = "settings"
     const val STUDENT_SEARCH = "students/search"
+    const val NEW_ASSESSMENT = "assessments/new"
+    const val NEW_FEEDBACK = "feedback/new"
 
     const val SYSTEM_ID_ARG = "systemId"
     const val SIGN_ID_ARG = "signId"
