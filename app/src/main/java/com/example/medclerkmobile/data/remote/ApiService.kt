@@ -42,6 +42,9 @@ interface ApiService {
     @GET("logbook-entries")
     suspend fun pendingLogbookEntries(@Query("needs_assessment") needsAssessment: Boolean = true): PaginatedResponse<LogbookEntry>
 
+    @GET("logbook-entries/{id}")
+    suspend fun logbookEntry(@Path("id") id: Int): LogbookEntry
+
     @POST("logbook-entries")
     suspend fun createLogbookEntry(@Body entry: NewLogbookEntry): LogbookEntry
 

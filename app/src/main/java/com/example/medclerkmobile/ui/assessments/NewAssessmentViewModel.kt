@@ -21,12 +21,11 @@ import kotlinx.coroutines.launch
 class NewAssessmentViewModel(
     private val assessmentRepository: AssessmentRepository,
     private val logbookRepository: LogbookRepository,
+    private val logbookEntryId: Int,
 ) : ViewModel() {
-    private val _options = MutableStateFlow<UiState<List<LogbookEntry>>>(UiState.Loading)
-    val options: StateFlow<UiState<List<LogbookEntry>>> = _options
+    private val _entry = MutableStateFlow<UiState<LogbookEntry>>(UiState.Loading)
+    val entry: StateFlow<UiState<LogbookEntry>> = _entry
 
-    var selectedLogEntry by mutableStateOf<LogbookEntry?>(null)
-        private set
     var score by mutableStateOf("")
         private set
     var maxScore by mutableStateOf("100")
@@ -39,23 +38,16 @@ class NewAssessmentViewModel(
         private set
 
     init {
-        loadOptions()
+        loadEntry()
     }
 
-    private fun loadOptions() {
-        _options.value = UiState.Loading
+    private fun loadEntry() {
+        _entry.value = UiState.Loading
         viewModelScope.launch {
-            logbookRepository.pendingAssessments()
-                .onSuccess {
-                    _options.value = UiState.Success(it)
-                    selectedLogEntry = it.firstOrNull()
-                }
-                .onFailure { _options.value = UiState.Error(it.message ?: "Couldn't load your students' logged encounters.") }
+            logbookRepository.entry(logbookEntryId)
+                .onSuccess { _entry.value = UiState.Success(it) }
+                .onFailure { _entry.value = UiState.Error(it.message ?: "Couldn't load this encounter.") }
         }
-    }
-
-    fun onLogEntrySelected(entry: LogbookEntry) {
-        selectedLogEntry = entry
     }
 
     fun onScoreChange(value: String) {
@@ -71,14 +63,9 @@ class NewAssessmentViewModel(
     }
 
     fun submit(onSuccess: () -> Unit) {
-        val entry = selectedLogEntry
         val scoreValue = score.toDoubleOrNull()
         val maxScoreValue = maxScore.toDoubleOrNull()
 
-        if (entry == null) {
-            errorMessage = "Select a logged encounter first."
-            return
-        }
         if (scoreValue == null || maxScoreValue == null || maxScoreValue <= 0 || scoreValue > maxScoreValue) {
             errorMessage = "Enter a valid score and max score."
             return
@@ -90,7 +77,7 @@ class NewAssessmentViewModel(
         viewModelScope.launch {
             val result = assessmentRepository.createAssessment(
                 NewAssessment(
-                    logbookEntryId = entry.id,
+                    logbookEntryId = logbookEntryId,
                     score = scoreValue,
                     maxScore = maxScoreValue,
                     assessedAt = assessedAt,

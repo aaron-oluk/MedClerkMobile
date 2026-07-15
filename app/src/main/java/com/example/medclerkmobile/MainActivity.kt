@@ -18,6 +18,7 @@ import androidx.navigation.navArgument
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.navigation.Routes
 import com.example.medclerkmobile.ui.assessments.NewAssessmentScreen
+import com.example.medclerkmobile.ui.assessments.PendingAssessmentsScreen
 import com.example.medclerkmobile.ui.auth.LoginScreen
 import com.example.medclerkmobile.ui.dashboard.DashboardScreen
 import com.example.medclerkmobile.ui.feedback.FeedbackScreen
@@ -71,7 +72,7 @@ private fun MedClerkApp(container: AppContainer) {
                 onOpenFeedback = { navController.navigate(Routes.FEEDBACK) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenStudentSearch = { navController.navigate(Routes.STUDENT_SEARCH) },
-                onAddAssessment = { navController.navigate(Routes.NEW_ASSESSMENT) },
+                onAddAssessment = { navController.navigate(Routes.PENDING_ASSESSMENTS) },
                 onLoggedOut = { navController.navigateToLogin() },
             )
         }
@@ -88,9 +89,22 @@ private fun MedClerkApp(container: AppContainer) {
             )
         }
 
-        composable(Routes.NEW_ASSESSMENT) {
+        composable(Routes.PENDING_ASSESSMENTS) {
+            PendingAssessmentsScreen(
+                container = container,
+                onBack = { navController.popBackStack() },
+                onOpenEntry = { id -> navController.navigate(Routes.newAssessment(id)) },
+            )
+        }
+
+        composable(
+            Routes.NEW_ASSESSMENT,
+            arguments = listOf(navArgument(Routes.LOGBOOK_ENTRY_ID_ARG) { type = NavType.IntType }),
+        ) { backStackEntry ->
+            val logbookEntryId = backStackEntry.arguments?.getInt(Routes.LOGBOOK_ENTRY_ID_ARG) ?: return@composable
             NewAssessmentScreen(
                 container = container,
+                logbookEntryId = logbookEntryId,
                 onSaved = { navController.popBackStack() },
                 onCancel = { navController.popBackStack() },
             )

@@ -28,27 +28,28 @@ import androidx.compose.ui.unit.dp
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.LogbookEntry
 import com.example.medclerkmobile.ui.DateField
-import com.example.medclerkmobile.ui.DropdownField
 import com.example.medclerkmobile.ui.MedCard
 import com.example.medclerkmobile.ui.ScreenHeader
 import com.example.medclerkmobile.ui.SectionTitle
 import com.example.medclerkmobile.ui.UiState
 import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.formatApiDate
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.jsonPrimitive
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewAssessmentScreen(container: AppContainer, onSaved: () -> Unit, onCancel: () -> Unit) {
+fun NewAssessmentScreen(container: AppContainer, logbookEntryId: Int, onSaved: () -> Unit, onCancel: () -> Unit) {
     val viewModel = appViewModel(container, key = "new-assessment") {
-        NewAssessmentViewModel(it.assessmentRepository, it.logbookRepository)
+        NewAssessmentViewModel(it.assessmentRepository, it.logbookRepository, logbookEntryId)
     }
-    val optionsState by viewModel.options.collectAsState()
+    val entryState by viewModel.entry.collectAsState()
 
     Scaffold(
         topBar = { ScreenHeader(title = "Give an assessment", onBack = onCancel) },
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            when (val state = optionsState) {
+            when (val state = entryState) {
                 is UiState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -57,23 +58,26 @@ fun NewAssessmentScreen(container: AppContainer, onSaved: () -> Unit, onCancel: 
                     Text(text = state.message, color = MaterialTheme.colorScheme.error)
                 }
 
-                is UiState.Success -> if (state.data.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "No unscored encounters from your students right now.",
-                            modifier = Modifier.padding(24.dp),
-                        )
-                    }
-                } else {
-                    NewAssessmentForm(viewModel = viewModel, logEntries = state.data, onSaved = onSaved)
-                }
+                is UiState.Success -> NewAssessmentForm(viewModel = viewModel, entry = state.data, onSaved = onSaved)
             }
         }
     }
 }
 
+private fun LogbookEntry.findingText(key: String): String? {
+    val element = findings?.get(key) ?: return null
+    if (element is JsonNull) return null
+    return element.jsonPrimitive.content.takeIf { it.isNotBlank() }
+}
+
 @Composable
-private fun NewAssessmentForm(viewModel: NewAssessmentViewModel, logEntries: List<LogbookEntry>, onSaved: () -> Unit) {
+private fun NewAssessmentForm(viewModel: NewAssessmentViewModel, entry: LogbookEntry, onSaved: () -> Unit) {
+    val chiefComplaint = entry.findingText("chief_complaint")
+    val examinationFindings = entry.findingText("examination_findings")
+    val impression = entry.findingText("impression")
+    val plan = entry.findingText("plan")
+    val hasNothingToShow = chiefComplaint == null && examinationFindings == null && impression == null && plan == null && entry.notes == null
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,24 +88,31 @@ private fun NewAssessmentForm(viewModel: NewAssessmentViewModel, logEntries: Lis
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SectionTitle(text = "Encounter")
             MedCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    DropdownField(
-                        label = "Student and encounter",
-                        options = logEntries,
-                        selected = viewModel.selectedLogEntry,
-                        optionLabel = { entry ->
-                            "${entry.student?.name ?: "Student"} — ${entry.skill?.name ?: "Skill"} (${formatApiDate(entry.encounterDate)})"
-                        },
-                        onSelected = viewModel::onLogEntrySelected,
-                        modifier = Modifier.fillMaxWidth(),
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = "${entry.student?.name ?: "Student"} — ${entry.skill?.name ?: "Skill"}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "${formatApiDate(entry.encounterDate)} · ${entry.rotation?.name ?: "Rotation"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
-                    DateField(
-                        label = "Assessed on",
-                        value = viewModel.assessedAt,
-                        onValueChange = viewModel::onAssessedAtChange,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    FindingBlock("Chief complaint", chiefComplaint)
+                    FindingBlock("Examination findings", examinationFindings)
+                    FindingBlock("Impression", impression)
+                    FindingBlock("Plan", plan)
+                    FindingBlock("Notes", entry.notes)
+
+                    if (hasNothingToShow) {
+                        Text(
+                            text = "No structured findings recorded for this encounter.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
@@ -109,26 +120,32 @@ private fun NewAssessmentForm(viewModel: NewAssessmentViewModel, logEntries: Lis
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             SectionTitle(text = "Score")
             MedCard(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    OutlinedTextField(
-                        value = viewModel.score,
-                        onValueChange = viewModel::onScoreChange,
-                        label = { Text("Score") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.weight(1f),
-                    )
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = viewModel.score,
+                            onValueChange = viewModel::onScoreChange,
+                            label = { Text("Score") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.weight(1f),
+                        )
 
-                    OutlinedTextField(
-                        value = viewModel.maxScore,
-                        onValueChange = viewModel::onMaxScoreChange,
-                        label = { Text("Out of") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.weight(1f),
+                        OutlinedTextField(
+                            value = viewModel.maxScore,
+                            onValueChange = viewModel::onMaxScoreChange,
+                            label = { Text("Out of") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+
+                    DateField(
+                        label = "Assessed on",
+                        value = viewModel.assessedAt,
+                        onValueChange = viewModel::onAssessedAtChange,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
@@ -149,5 +166,24 @@ private fun NewAssessmentForm(viewModel: NewAssessmentViewModel, logEntries: Lis
                 Text("Save assessment", fontWeight = FontWeight.SemiBold)
             }
         }
+    }
+}
+
+@Composable
+private fun FindingBlock(label: String, value: String?) {
+    if (value == null) return
+
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 2.dp),
+        )
     }
 }
