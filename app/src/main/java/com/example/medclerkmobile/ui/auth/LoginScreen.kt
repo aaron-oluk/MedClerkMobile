@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,7 +25,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -57,7 +59,6 @@ import com.example.medclerkmobile.ui.ChipColor
 import com.example.medclerkmobile.ui.MedChip
 import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.theme.Teal700
-import com.example.medclerkmobile.ui.theme.Teal800
 
 private val roles = listOf("Student", "Lecturer", "Admin")
 private val roleHelperText = listOf(
@@ -266,6 +267,7 @@ private fun LoginHeader() {
         modifier = Modifier
             .fillMaxWidth()
             .background(Teal700, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(24.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -298,24 +300,8 @@ private fun LoginHeader() {
             text = "Sign in to record encounters, complete assessments, and track your competency progress.",
             color = Color.White.copy(alpha = 0.85f),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 6.dp),
+            modifier = Modifier.padding(top = 6.dp, bottom = 4.dp),
         )
-
-        Row(
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .background(Teal800, RoundedCornerShape(50))
-                .padding(horizontal = 12.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Filled.School, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-            Text(
-                text = "Kabale University School of Medicine",
-                color = Color.White,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(start = 6.dp),
-            )
-        }
     }
 }private fun Modifier.clickableRole(onClick: () -> Unit): Modifier =
     this.clickable(onClick = onClick)

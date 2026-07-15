@@ -20,9 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // 10.0.2.2 is the host loopback alias on the Android emulator, pointing at
-        // `php artisan serve` running on the host machine.
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8001/api/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://medclerk.aloflux.com/api/\"")
     }
 
     buildTypes {
