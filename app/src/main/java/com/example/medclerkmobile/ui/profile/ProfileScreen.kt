@@ -16,7 +16,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,6 +58,8 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     container: AppContainer,
     onOpenRotations: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenStudentSearch: () -> Unit,
     onLoggedOut: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -85,6 +90,8 @@ fun ProfileScreen(
             is UiState.Success -> ProfileContent(
                 data = s.data,
                 onOpenRotations = onOpenRotations,
+                onOpenSettings = onOpenSettings,
+                onOpenStudentSearch = onOpenStudentSearch,
                 onSignOut = {
                     scope.launch {
                         container.authRepository.logout()
@@ -97,7 +104,13 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileContent(data: ProfileData, onOpenRotations: () -> Unit, onSignOut: () -> Unit) {
+private fun ProfileContent(
+    data: ProfileData,
+    onOpenRotations: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenStudentSearch: () -> Unit,
+    onSignOut: () -> Unit,
+) {
     Column {
         ProfileHeader(data)
 
@@ -195,6 +208,17 @@ private fun ProfileContent(data: ProfileData, onOpenRotations: () -> Unit, onSig
                 }
             }
 
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (data.user.role == "lecturer") {
+                    NavigationRow(
+                        label = "Find a student",
+                        icon = Icons.Filled.PersonSearch,
+                        onClick = onOpenStudentSearch,
+                    )
+                }
+                NavigationRow(label = "Settings", icon = Icons.Filled.Settings, onClick = onOpenSettings)
+            }
+
             Button(
                 onClick = onSignOut,
                 colors = ButtonDefaults.buttonColors(containerColor = Red100, contentColor = Red700),
@@ -202,6 +226,25 @@ private fun ProfileContent(data: ProfileData, onOpenRotations: () -> Unit, onSig
             ) {
                 Text("Sign out")
             }
+        }
+    }
+}
+
+@Composable
+private fun NavigationRow(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    MedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, contentDescription = null, tint = Teal700)
+                Text(text = label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 12.dp))
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Neutral500)
         }
     }
 }

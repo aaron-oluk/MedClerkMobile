@@ -35,7 +35,7 @@ private data class DashboardTab(val label: String, val icon: androidx.compose.ui
 
 private val tabs = listOf(
     DashboardTab("Home", Icons.Filled.Home),
-    DashboardTab("Library", Icons.Filled.LocalLibrary),
+    DashboardTab("Reference", Icons.Filled.LocalLibrary),
     DashboardTab("Logbook", Icons.AutoMirrored.Filled.MenuBook),
     DashboardTab("Results", Icons.AutoMirrored.Filled.Assignment),
     DashboardTab("Profile", Icons.Filled.Person),
@@ -50,6 +50,8 @@ fun DashboardScreen(
     onOpenLibrarySign: (Int) -> Unit,
     onOpenRotations: () -> Unit,
     onOpenFeedback: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenStudentSearch: () -> Unit,
     onLoggedOut: () -> Unit,
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -96,7 +98,7 @@ fun DashboardScreen(
             1 -> LibraryScreen(container, onOpenLibrarySystem, onOpenLibrarySign, content)
             2 -> LogbookScreen(container, onAddLogbookEntry, content)
             3 -> AssessmentsScreen(container, content)
-            else -> ProfileScreen(container, onOpenRotations, onLoggedOut, content)
+            else -> ProfileScreen(container, onOpenRotations, onOpenSettings, onOpenStudentSearch, onLoggedOut, content)
         }
     }
 }

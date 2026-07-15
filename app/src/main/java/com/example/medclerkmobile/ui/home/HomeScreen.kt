@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.ClinicalSystem
 import com.example.medclerkmobile.data.model.Rotation
+import com.example.medclerkmobile.data.model.User
 import com.example.medclerkmobile.ui.MedCard
 import com.example.medclerkmobile.ui.ProgressRing
 import com.example.medclerkmobile.ui.SectionTitle
@@ -130,6 +131,11 @@ private fun HomeContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SectionTitle(text = "Your profile")
+            ProfileSummaryCard(data.user)
+        }
+
         data.activeRotation?.let { rotation ->
             ActiveRotationCard(rotation, onAddLogbookEntry, onOpenRotations)
         }
@@ -169,6 +175,27 @@ private fun HomeContent(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ProfileSummaryCard(user: User) {
+    MedCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            ProfileField(label = "Name", value = user.name)
+            ProfileField(label = "Registration number", value = user.studentNumber ?: "Not set")
+            ProfileField(label = "Programme", value = user.programme ?: "Not set")
+            ProfileField(label = "University", value = user.institution?.name ?: "Not set")
+            ProfileField(label = "Current placement", value = user.currentPlacement ?: "Not set")
+        }
+    }
+}
+
+@Composable
+private fun ProfileField(label: String, value: String) {
+    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
     }
 }
 

@@ -25,6 +25,9 @@ import com.example.medclerkmobile.ui.library.SkillDetailScreen
 import com.example.medclerkmobile.ui.library.SystemDetailScreen
 import com.example.medclerkmobile.ui.logbook.NewLogbookEntryScreen
 import com.example.medclerkmobile.ui.rotations.RotationsScreen
+import com.example.medclerkmobile.ui.settings.SettingsScreen
+import com.example.medclerkmobile.ui.students.StudentProfileScreen
+import com.example.medclerkmobile.ui.students.StudentSearchScreen
 import com.example.medclerkmobile.ui.theme.MedClerkMobileTheme
 
 class MainActivity : ComponentActivity() {
@@ -64,6 +67,8 @@ private fun MedClerkApp(container: AppContainer) {
                 onOpenLibrarySign = { id -> navController.navigate(Routes.signDetail(id)) },
                 onOpenRotations = { navController.navigate(Routes.ROTATIONS) },
                 onOpenFeedback = { navController.navigate(Routes.FEEDBACK) },
+                onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onOpenStudentSearch = { navController.navigate(Routes.STUDENT_SEARCH) },
                 onLoggedOut = { navController.navigateToLogin() },
             )
         }
@@ -74,6 +79,26 @@ private fun MedClerkApp(container: AppContainer) {
 
         composable(Routes.FEEDBACK) {
             FeedbackScreen(container = container, onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.SETTINGS) {
+            SettingsScreen(container = container, onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.STUDENT_SEARCH) {
+            StudentSearchScreen(
+                container = container,
+                onBack = { navController.popBackStack() },
+                onOpenStudent = { id -> navController.navigate(Routes.studentDetail(id)) },
+            )
+        }
+
+        composable(
+            Routes.STUDENT_DETAIL,
+            arguments = listOf(navArgument(Routes.STUDENT_ID_ARG) { type = NavType.IntType }),
+        ) { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getInt(Routes.STUDENT_ID_ARG) ?: return@composable
+            StudentProfileScreen(container = container, studentId = studentId, onBack = { navController.popBackStack() })
         }
 
         composable(Routes.NEW_LOGBOOK_ENTRY) {

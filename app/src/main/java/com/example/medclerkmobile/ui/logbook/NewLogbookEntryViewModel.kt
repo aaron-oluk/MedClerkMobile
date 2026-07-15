@@ -14,6 +14,7 @@ import com.example.medclerkmobile.ui.UiState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -40,6 +41,8 @@ class NewLogbookEntryViewModel(
     var encounterDate by mutableStateOf(today())
         private set
     var notes by mutableStateOf("")
+        private set
+    var consentConfirmed by mutableStateOf(false)
         private set
     var isSubmitting by mutableStateOf(false)
         private set
@@ -91,10 +94,19 @@ class NewLogbookEntryViewModel(
         notes = value
     }
 
+    fun onConsentChange(value: Boolean) {
+        consentConfirmed = value
+    }
+
     fun submit(onSuccess: () -> Unit) {
         val rotation = selectedRotation
         if (rotation == null) {
             errorMessage = "Select a rotation first."
+            return
+        }
+
+        if (!consentConfirmed) {
+            errorMessage = "Confirm patient consent before saving."
             return
         }
 
@@ -109,6 +121,7 @@ class NewLogbookEntryViewModel(
                     skillId = selectedSkill?.id,
                     encounterDate = encounterDate,
                     notes = notes.ifBlank { null },
+                    consentConfirmed = consentConfirmed,
                 ),
             )
             isSubmitting = false
@@ -119,6 +132,7 @@ class NewLogbookEntryViewModel(
     }
 
     private companion object {
-        fun today(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        fun today(): String =
+            SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }.format(Date())
     }
 }

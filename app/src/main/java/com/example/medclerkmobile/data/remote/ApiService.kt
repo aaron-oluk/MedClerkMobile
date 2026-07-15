@@ -12,9 +12,11 @@ import com.example.medclerkmobile.data.model.NewLogbookEntry
 import com.example.medclerkmobile.data.model.PaginatedResponse
 import com.example.medclerkmobile.data.model.Rotation
 import com.example.medclerkmobile.data.model.Skill
+import com.example.medclerkmobile.data.model.UpdateSettingsRequest
 import com.example.medclerkmobile.data.model.User
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -67,4 +69,13 @@ interface ApiService {
 
     @GET("skills/{id}")
     suspend fun skill(@Path("id") id: Int): Skill
+
+    @PATCH("settings")
+    suspend fun updateSettings(@Body request: UpdateSettingsRequest): User
+
+    @GET("students/search")
+    suspend fun searchStudents(@Query("q") query: String? = null): PaginatedResponse<User>
+
+    @GET("students/{id}")
+    suspend fun student(@Path("id") id: Int): User
 }

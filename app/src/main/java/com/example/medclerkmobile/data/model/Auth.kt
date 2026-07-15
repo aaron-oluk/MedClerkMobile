@@ -27,6 +27,9 @@ data class User(
     @SerialName("department_id") val departmentId: Int? = null,
     val institution: Institution? = null,
     val department: Department? = null,
+    val programme: String? = null,
+    @SerialName("current_placement") val currentPlacement: String? = null,
+    @SerialName("email_notifications_enabled") val emailNotificationsEnabled: Boolean = true,
 )
 
 @Serializable

@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.medclerkmobile.data.AppContainer
 import com.example.medclerkmobile.data.model.ClinicalSystem
 import com.example.medclerkmobile.data.model.Rotation
+import com.example.medclerkmobile.data.model.User
 import com.example.medclerkmobile.ui.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 data class HomeData(
+    val user: User,
     val activeRotation: Rotation?,
     val assessmentCount: Int,
     val feedbackCount: Int,
@@ -29,12 +31,13 @@ class HomeViewModel(private val container: AppContainer) : ViewModel() {
     fun refresh() {
         _state.value = UiState.Loading
         viewModelScope.launch {
+            val user = container.authRepository.currentUser()
             val rotations = container.rotationRepository.myRotations()
             val assessments = container.assessmentRepository.myAssessments()
             val feedback = container.feedbackRepository.myFeedback()
             val systems = container.libraryRepository.systems()
 
-            val failure = listOf(rotations, assessments, feedback, systems).firstOrNull { it.isFailure }
+            val failure = listOf(user, rotations, assessments, feedback, systems).firstOrNull { it.isFailure }
             if (failure != null) {
                 _state.value = UiState.Error(failure.exceptionOrNull()?.message ?: "Couldn't load your dashboard.")
                 return@launch
@@ -46,6 +49,7 @@ class HomeViewModel(private val container: AppContainer) : ViewModel() {
 
             _state.value = UiState.Success(
                 HomeData(
+                    user = user.getOrThrow(),
                     activeRotation = rotations.getOrThrow().firstOrNull { it.status == "active" }
                         ?: rotations.getOrThrow().firstOrNull(),
                     assessmentCount = assessments.getOrThrow().size,

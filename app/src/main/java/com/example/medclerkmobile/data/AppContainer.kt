@@ -12,6 +12,8 @@ import com.example.medclerkmobile.data.repository.FeedbackRepository
 import com.example.medclerkmobile.data.repository.LibraryRepository
 import com.example.medclerkmobile.data.repository.LogbookRepository
 import com.example.medclerkmobile.data.repository.RotationRepository
+import com.example.medclerkmobile.data.repository.SettingsRepository
+import com.example.medclerkmobile.data.repository.StudentLookupRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
@@ -64,6 +66,8 @@ class AppContainer(context: Context) {
     val assessmentRepository = AssessmentRepository(apiService)
     val feedbackRepository = FeedbackRepository(apiService)
     val libraryRepository = LibraryRepository(apiService)
+    val settingsRepository = SettingsRepository(apiService)
+    val studentLookupRepository = StudentLookupRepository(apiService)
 
     val currentUserName: String? get() = tokenStore.userName
     val currentUserRole: String? get() = tokenStore.userRole

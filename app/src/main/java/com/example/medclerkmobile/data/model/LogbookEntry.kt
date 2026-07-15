@@ -16,6 +16,7 @@ data class LogbookEntry(
     val rotation: NamedRef? = null,
     @SerialName("clinical_sign") val clinicalSign: NamedRef? = null,
     val skill: NamedRef? = null,
+    @SerialName("consent_confirmed") val consentConfirmed: Boolean = false,
 )
 
 @Serializable
@@ -25,4 +26,5 @@ data class NewLogbookEntry(
     @SerialName("skill_id") val skillId: Int? = null,
     @SerialName("encounter_date") val encounterDate: String,
     val notes: String? = null,
+    @SerialName("consent_confirmed") val consentConfirmed: Boolean,
 )
