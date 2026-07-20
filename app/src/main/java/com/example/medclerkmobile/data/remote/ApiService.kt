@@ -40,7 +40,7 @@ interface ApiService {
     suspend fun logbookEntries(): PaginatedResponse<LogbookEntry>
 
     @GET("logbook-entries")
-    suspend fun pendingLogbookEntries(@Query("needs_assessment") needsAssessment: Boolean = true): PaginatedResponse<LogbookEntry>
+    suspend fun pendingReview(@Query("needs_review") needsReview: Boolean = true): PaginatedResponse<LogbookEntry>
 
     @GET("logbook-entries/{id}")
     suspend fun logbookEntry(@Path("id") id: Int): LogbookEntry
@@ -48,8 +48,14 @@ interface ApiService {
     @POST("logbook-entries")
     suspend fun createLogbookEntry(@Body entry: NewLogbookEntry): LogbookEntry
 
+    @POST("logbook-entries/{id}/sign-off")
+    suspend fun signOffLogbookEntry(@Path("id") id: Int): LogbookEntry
+
     @GET("assessments")
     suspend fun assessments(): PaginatedResponse<Assessment>
+
+    @GET("assessments/{id}")
+    suspend fun assessment(@Path("id") id: Int): Assessment
 
     @GET("feedback")
     suspend fun feedback(): PaginatedResponse<Feedback>

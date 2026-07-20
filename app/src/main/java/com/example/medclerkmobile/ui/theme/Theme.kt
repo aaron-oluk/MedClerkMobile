@@ -62,6 +62,7 @@ fun MedClerkMobileTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = MedClerkShapes,
         content = content
     )
 }

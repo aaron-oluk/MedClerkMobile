@@ -57,7 +57,7 @@ fun FeedbackScreen(container: AppContainer, onBack: () -> Unit, onAddFeedback: (
 }
 
 @Composable
-private fun FeedbackCard(feedback: Feedback) {
+fun FeedbackCard(feedback: Feedback) {
     MedCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             feedback.givenBy?.let {

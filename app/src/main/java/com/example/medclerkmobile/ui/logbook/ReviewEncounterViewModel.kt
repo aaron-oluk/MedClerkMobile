@@ -1,4 +1,4 @@
-package com.example.medclerkmobile.ui.assessments
+package com.example.medclerkmobile.ui.logbook
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,9 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class NewAssessmentViewModel(
-    private val assessmentRepository: AssessmentRepository,
+class ReviewEncounterViewModel(
     private val logbookRepository: LogbookRepository,
+    private val assessmentRepository: AssessmentRepository,
     private val logbookEntryId: Int,
 ) : ViewModel() {
     private val _entry = MutableStateFlow<UiState<LogbookEntry>>(UiState.Loading)
@@ -32,9 +32,15 @@ class NewAssessmentViewModel(
         private set
     var assessedAt by mutableStateOf(today())
         private set
-    var isSubmitting by mutableStateOf(false)
+
+    var isSigningOff by mutableStateOf(false)
         private set
-    var errorMessage by mutableStateOf<String?>(null)
+    var signOffError by mutableStateOf<String?>(null)
+        private set
+
+    var isSubmittingAssessment by mutableStateOf(false)
+        private set
+    var assessmentError by mutableStateOf<String?>(null)
         private set
 
     init {
@@ -62,17 +68,30 @@ class NewAssessmentViewModel(
         assessedAt = value
     }
 
-    fun submit(onSuccess: () -> Unit) {
+    fun signOff(onFullyReviewed: () -> Unit) {
+        isSigningOff = true
+        signOffError = null
+
+        viewModelScope.launch {
+            val result = logbookRepository.signOffEntry(logbookEntryId)
+            isSigningOff = false
+            result
+                .onSuccess { refreshAndMaybeFinish(onFullyReviewed) }
+                .onFailure { signOffError = it.message ?: "Couldn't sign off this encounter." }
+        }
+    }
+
+    fun submitAssessment(onFullyReviewed: () -> Unit) {
         val scoreValue = score.toDoubleOrNull()
         val maxScoreValue = maxScore.toDoubleOrNull()
 
         if (scoreValue == null || maxScoreValue == null || maxScoreValue <= 0 || scoreValue > maxScoreValue) {
-            errorMessage = "Enter a valid score and max score."
+            assessmentError = "Enter a valid score and max score."
             return
         }
 
-        isSubmitting = true
-        errorMessage = null
+        isSubmittingAssessment = true
+        assessmentError = null
 
         viewModelScope.launch {
             val result = assessmentRepository.createAssessment(
@@ -83,10 +102,21 @@ class NewAssessmentViewModel(
                     assessedAt = assessedAt,
                 ),
             )
-            isSubmitting = false
+            isSubmittingAssessment = false
             result
-                .onSuccess { onSuccess() }
-                .onFailure { errorMessage = it.message ?: "Couldn't save the assessment." }
+                .onSuccess { refreshAndMaybeFinish(onFullyReviewed) }
+                .onFailure { assessmentError = it.message ?: "Couldn't save the assessment." }
+        }
+    }
+
+    private fun refreshAndMaybeFinish(onFullyReviewed: () -> Unit) {
+        viewModelScope.launch {
+            logbookRepository.entry(logbookEntryId).onSuccess { updated ->
+                _entry.value = UiState.Success(updated)
+                if (!updated.needsSignOff && !updated.needsAssessment) {
+                    onFullyReviewed()
+                }
+            }
         }
     }
 

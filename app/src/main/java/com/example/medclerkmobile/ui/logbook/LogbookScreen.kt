@@ -2,11 +2,14 @@ package com.example.medclerkmobile.ui.logbook
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,17 +30,25 @@ import com.example.medclerkmobile.ui.StateListContent
 import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.formatApiDate
 
+private val canReview = setOf("lecturer", "superadmin")
+
 @Composable
-fun LogbookScreen(container: AppContainer, onAddEntry: () -> Unit, modifier: Modifier = Modifier) {
+fun LogbookScreen(container: AppContainer, onAddEntry: () -> Unit, onOpenPendingReview: () -> Unit, modifier: Modifier = Modifier) {
     val viewModel = appViewModel(container, key = "logbook-entries") { ListViewModel { it.logbookRepository.myEntries() } }
     val state by viewModel.state.collectAsState()
+    val role = container.currentUserRole
 
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
-            if (container.currentUserRole == "student") {
+            if (role == "student") {
                 FloatingActionButton(onClick = onAddEntry) {
                     Icon(Icons.Filled.Add, contentDescription = "Log a new encounter")
+                }
+            } else if (role != null && role in canReview) {
+                ExtendedFloatingActionButton(onClick = onOpenPendingReview) {
+                    Icon(Icons.Filled.CheckCircle, contentDescription = null)
+                    Text(text = "Pending review", modifier = Modifier.padding(start = 8.dp))
                 }
             }
         },
@@ -60,8 +71,15 @@ private fun LogbookEntryCard(entry: LogbookEntry) {
                 text = entry.clinicalSign?.name ?: entry.skill?.name ?: "Clinical encounter",
                 style = MaterialTheme.typography.titleMedium,
             )
-            entry.rotation?.let {
-                MedChip(text = it.name, color = ChipColor.Teal, modifier = Modifier.padding(top = 6.dp))
+            Row(modifier = Modifier.padding(top = 6.dp)) {
+                entry.rotation?.let {
+                    MedChip(text = it.name, color = ChipColor.Teal)
+                }
+                if (entry.signedOffAt != null) {
+                    MedChip(text = "Signed off", color = ChipColor.Teal, modifier = Modifier.padding(start = 6.dp))
+                } else {
+                    MedChip(text = "Awaiting sign-off", color = ChipColor.Amber, modifier = Modifier.padding(start = 6.dp))
+                }
             }
             Text(
                 text = formatApiDate(entry.encounterDate),

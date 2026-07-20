@@ -18,7 +18,13 @@ data class LogbookEntry(
     val skill: NamedRef? = null,
     val student: NamedRef? = null,
     @SerialName("consent_confirmed") val consentConfirmed: Boolean = false,
-)
+    @SerialName("signed_off_at") val signedOffAt: String? = null,
+    @SerialName("signed_off_by") val signedOffBy: NamedRef? = null,
+    @SerialName("assessments_count") val assessmentsCount: Int = 0,
+) {
+    val needsSignOff: Boolean get() = signedOffAt == null
+    val needsAssessment: Boolean get() = skillId != null && assessmentsCount == 0
+}
 
 @Serializable
 data class NewLogbookEntry(

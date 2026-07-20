@@ -45,7 +45,7 @@ import com.example.medclerkmobile.ui.theme.Teal600
 private val canGiveAssessment = setOf("lecturer", "superadmin")
 
 @Composable
-fun AssessmentsScreen(container: AppContainer, onAddAssessment: () -> Unit, modifier: Modifier = Modifier) {
+fun AssessmentsScreen(container: AppContainer, onOpenPendingReview: () -> Unit, onOpenAssessment: (Int) -> Unit, modifier: Modifier = Modifier) {
     val viewModel = appViewModel(container, key = "assessments") { ListViewModel { it.assessmentRepository.myAssessments() } }
     val state by viewModel.state.collectAsState()
 
@@ -54,8 +54,8 @@ fun AssessmentsScreen(container: AppContainer, onAddAssessment: () -> Unit, modi
         floatingActionButton = {
             val role = container.currentUserRole
             if (role != null && role in canGiveAssessment) {
-                FloatingActionButton(onClick = onAddAssessment) {
-                    Icon(Icons.Filled.Add, contentDescription = "Give an assessment")
+                FloatingActionButton(onClick = onOpenPendingReview) {
+                    Icon(Icons.Filled.Add, contentDescription = "Pending review")
                 }
             }
         },
@@ -78,7 +78,7 @@ fun AssessmentsScreen(container: AppContainer, onAddAssessment: () -> Unit, modi
                 is UiState.Success -> if (s.data.isEmpty()) {
                     EmptyResults()
                 } else {
-                    AssessmentsContent(s.data)
+                    AssessmentsContent(s.data, onOpenAssessment)
                 }
             }
         }
@@ -105,7 +105,7 @@ private fun EmptyResults() {
 }
 
 @Composable
-private fun AssessmentsContent(assessments: List<Assessment>) {
+private fun AssessmentsContent(assessments: List<Assessment>, onOpenAssessment: (Int) -> Unit) {
     val groups = assessments
         .groupBy { it.rotation?.name ?: "Other" }
         .toList()
@@ -123,7 +123,7 @@ private fun AssessmentsContent(assessments: List<Assessment>) {
 
         groups.forEach { (rotationName, group) ->
             item { SectionTitle(text = rotationName, modifier = Modifier.padding(top = 8.dp)) }
-            items(group) { assessment -> AssessmentCard(assessment) }
+            items(group) { assessment -> AssessmentCard(assessment, onClick = { onOpenAssessment(assessment.id) }) }
         }
     }
 }
@@ -154,11 +154,11 @@ private fun SummaryCard(average: Float, count: Int) {
 }
 
 @Composable
-private fun AssessmentCard(assessment: Assessment) {
+private fun AssessmentCard(assessment: Assessment, onClick: () -> Unit) {
     val pct = scorePercent(assessment)
     val (label, chipColor) = resultBand(pct)
 
-    MedCard(modifier = Modifier.fillMaxWidth()) {
+    MedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -192,19 +192,19 @@ private fun AssessmentCard(assessment: Assessment) {
     }
 }
 
-private fun scorePercent(assessment: Assessment): Float {
+fun scorePercent(assessment: Assessment): Float {
     val score = assessment.score.toFloatOrNull() ?: 0f
     val maxScore = assessment.maxScore.toFloatOrNull()?.takeIf { it > 0f } ?: 100f
     return (score / maxScore) * 100f
 }
 
-private fun ringColor(pct: Float) = when {
+fun ringColor(pct: Float) = when {
     pct >= 75f -> Teal600
     pct >= 60f -> Amber600
     else -> Red600
 }
 
-private fun resultBand(pct: Float): Pair<String, ChipColor> = when {
+fun resultBand(pct: Float): Pair<String, ChipColor> = when {
     pct >= 75f -> "Strong" to ChipColor.Teal
     pct >= 60f -> "Developing" to ChipColor.Amber
     else -> "Needs focus" to ChipColor.Red

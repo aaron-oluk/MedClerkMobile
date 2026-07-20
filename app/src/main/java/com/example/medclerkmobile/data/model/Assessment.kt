@@ -13,6 +13,7 @@ data class Assessment(
     val skill: NamedRef? = null,
     val rotation: NamedRef? = null,
     val assessor: NamedRef? = null,
+    val feedback: List<Feedback> = emptyList(),
 )
 
 @Serializable

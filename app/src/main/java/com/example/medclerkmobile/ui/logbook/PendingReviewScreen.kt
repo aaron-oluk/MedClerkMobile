@@ -1,6 +1,7 @@
-package com.example.medclerkmobile.ui.assessments
+package com.example.medclerkmobile.ui.logbook
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -24,27 +25,27 @@ import com.example.medclerkmobile.ui.appViewModel
 import com.example.medclerkmobile.ui.formatApiDate
 
 @Composable
-fun PendingAssessmentsScreen(container: AppContainer, onBack: () -> Unit, onOpenEntry: (Int) -> Unit, modifier: Modifier = Modifier) {
-    val viewModel = appViewModel(container, key = "pending-assessments") {
-        ListViewModel { it.logbookRepository.pendingAssessments() }
+fun PendingReviewScreen(container: AppContainer, onBack: () -> Unit, onOpenEntry: (Int) -> Unit, modifier: Modifier = Modifier) {
+    val viewModel = appViewModel(container, key = "pending-review") {
+        ListViewModel { it.logbookRepository.pendingReview() }
     }
     val state by viewModel.state.collectAsState()
 
     Scaffold(
         modifier = modifier,
-        topBar = { ScreenHeader(title = "Pending encounters", onBack = onBack) },
+        topBar = { ScreenHeader(title = "Pending review", onBack = onBack) },
     ) { innerPadding ->
         StateListContent(
             state = state,
-            emptyMessage = "No unscored encounters from your students right now.",
+            emptyMessage = "Nothing from your students is waiting on sign-off or scoring.",
             onRetry = viewModel::refresh,
             modifier = Modifier.padding(innerPadding),
-        ) { entry -> PendingEntryCard(entry, onClick = { onOpenEntry(entry.id) }) }
+        ) { entry -> PendingReviewCard(entry, onClick = { onOpenEntry(entry.id) }) }
     }
 }
 
 @Composable
-private fun PendingEntryCard(entry: LogbookEntry, onClick: () -> Unit) {
+private fun PendingReviewCard(entry: LogbookEntry, onClick: () -> Unit) {
     MedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -53,13 +54,21 @@ private fun PendingEntryCard(entry: LogbookEntry, onClick: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = entry.skill?.name ?: "Skill",
+                text = entry.clinicalSign?.name ?: entry.skill?.name ?: "Clinical encounter",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 2.dp),
             )
-            entry.rotation?.let {
-                MedChip(text = it.name, color = ChipColor.Teal, modifier = Modifier.padding(top = 6.dp))
+            Row(modifier = Modifier.padding(top = 6.dp)) {
+                entry.rotation?.let {
+                    MedChip(text = it.name, color = ChipColor.Teal)
+                }
+                if (entry.needsSignOff) {
+                    MedChip(text = "Needs sign-off", color = ChipColor.Amber, modifier = Modifier.padding(start = 6.dp))
+                }
+                if (entry.needsAssessment) {
+                    MedChip(text = "Needs scoring", color = ChipColor.Violet, modifier = Modifier.padding(start = 6.dp))
+                }
             }
             Text(
                 text = formatApiDate(entry.encounterDate),
